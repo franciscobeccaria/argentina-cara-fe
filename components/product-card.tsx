@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import type { ProductType } from "@/lib/types"
 import { ArrowDown, ArrowUp, CalendarIcon, DollarSign, Percent } from "lucide-react"
@@ -10,26 +9,17 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { name, priceARS: originalPriceARS, priceUSDBlue, priceUSA, priceDifferencePercentage, image, lastUpdated, brand, category } = product
-  const { getCurrentDollarValue, selectedDollar, dollarTypes } = useDollar()
-  
-  // Determine if the product price is already in USD in Argentina
-  const isPriceInUSD = category === "tecnologia" && name.includes("iPhone")
-  
-  // Calculate price in USD based on the selected dollar type
+  const { name, priceArgentina, priceArgentinaCurreny, priceUSA, image, lastUpdated } = product
+  const { getCurrentDollarValue } = useDollar()
+  const isPriceInUSD = priceArgentinaCurreny === "USD"
   const dollarValue = getCurrentDollarValue()
-  
-  // For products with price in USD (like iPhone), recalculate ARS price based on selected dollar type
-  const priceARS = isPriceInUSD ? Math.round(priceUSDBlue * dollarValue) : originalPriceARS
-  
-  // Calculate USD price based on selected dollar type
-  const priceUSDSelected = isPriceInUSD ? priceUSDBlue : Math.round(originalPriceARS / dollarValue)
+  const priceInUSD = isPriceInUSD ? priceArgentina : priceArgentina / dollarValue
+  const priceInARS = isPriceInUSD ? priceArgentina * dollarValue : priceArgentina
 
-  // Determine if the price is higher or lower
-  const isHigher = priceDifferencePercentage > 0
-  const absoluteDiff = Math.abs(priceDifferencePercentage)
+  const priceDiff = priceInUSD - priceUSA
+  const percentageDiff = (priceDiff / priceUSA) * 100
+  const isHigher = priceDiff > 0
 
-  // Format the date to a more readable format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     return date.toLocaleDateString("es-AR", {
@@ -38,6 +28,17 @@ export default function ProductCard({ product }: ProductCardProps) {
       year: "numeric",
     })
   }
+
+  function formatMoney(value: number) {
+    const showDecimals = value <= 99;
+  
+    return new Intl.NumberFormat('es-AR', {
+      minimumFractionDigits: showDecimals ? 2 : 0,
+      maximumFractionDigits: showDecimals ? 2 : 0,
+      useGrouping: true,
+    }).format(value);
+  }
+  
 
   return (
     <Card className="overflow-hidden">
@@ -59,7 +60,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               className={`flex items-center gap-1 font-bold text-sm ${isHigher ? "text-red-600" : "text-green-600"}`}
             >
               {isHigher ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
-              {absoluteDiff.toFixed(1)}
+              {percentageDiff.toFixed(1)}
               <Percent className="w-4 h-4" />
             </div>
           </div>
@@ -72,16 +73,16 @@ export default function ProductCard({ product }: ProductCardProps) {
               <p className="text-muted-foreground">Argentina</p>
               {isPriceInUSD ? (
                 <>
-                  <p className="font-medium">USD {priceUSDBlue.toLocaleString()}</p>
+                  <p className="font-medium">USD {formatMoney(priceArgentina)}</p>
                   <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                    ARS {priceARS.toLocaleString()}
+                    ARS {formatMoney(priceInARS)}
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="font-medium">ARS {priceARS.toLocaleString()}</p>
+                  <p className="font-medium">ARS {formatMoney(priceArgentina)}</p>
                   <p className="text-xs text-muted-foreground flex items-center mt-1">
-                   USD {priceUSDSelected}
+                   USD {formatMoney(priceInUSD)}
                   </p>
                 </>
               )}
@@ -90,7 +91,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="space-y-1">
             <div>
               <p className="text-muted-foreground">EE.UU.</p>
-              <p className="font-medium">USD {priceUSA}</p>
+              <p className="font-medium">USD {formatMoney(priceUSA)}</p>
             </div>
           </div>
         </div>

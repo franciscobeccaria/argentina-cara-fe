@@ -1,10 +1,9 @@
 export interface ProductType {
   id: number
   name: string
-  priceARS: number
-  priceUSDBlue: number
+  priceArgentina: number
+  priceArgentinaCurreny: "USD" | "ARS"
   priceUSA: number
-  priceDifferencePercentage: number
   image?: string
   lastUpdated: string
   brand?: string
