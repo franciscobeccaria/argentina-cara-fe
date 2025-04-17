@@ -10,15 +10,20 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { name, priceARS, priceUSDBlue, priceUSA, priceDifferencePercentage, image, lastUpdated, brand, category } = product
-  const { getCurrentDollarValue, selectedDollar } = useDollar()
+  const { name, priceARS: originalPriceARS, priceUSDBlue, priceUSA, priceDifferencePercentage, image, lastUpdated, brand, category } = product
+  const { getCurrentDollarValue, selectedDollar, dollarTypes } = useDollar()
   
   // Determine if the product price is already in USD in Argentina
   const isPriceInUSD = category === "tecnologia" && name.includes("iPhone")
   
   // Calculate price in USD based on the selected dollar type
   const dollarValue = getCurrentDollarValue()
-  const priceUSDSelected = isPriceInUSD ? priceUSDBlue : Math.round(priceARS / dollarValue)
+  
+  // For products with price in USD (like iPhone), recalculate ARS price based on selected dollar type
+  const priceARS = isPriceInUSD ? Math.round(priceUSDBlue * dollarValue) : originalPriceARS
+  
+  // Calculate USD price based on selected dollar type
+  const priceUSDSelected = isPriceInUSD ? priceUSDBlue : Math.round(originalPriceARS / dollarValue)
 
   // Determine if the price is higher or lower
   const isHigher = priceDifferencePercentage > 0
@@ -68,7 +73,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               {isPriceInUSD ? (
                 <>
                   <p className="font-medium">USD {priceUSDBlue.toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center">
                     ARS {priceARS.toLocaleString()}
                   </p>
                 </>
@@ -76,7 +81,7 @@ export default function ProductCard({ product }: ProductCardProps) {
                 <>
                   <p className="font-medium">ARS {priceARS.toLocaleString()}</p>
                   <p className="text-xs text-muted-foreground flex items-center mt-1">
-                    USD {priceUSDSelected}
+                   USD {priceUSDSelected}
                   </p>
                 </>
               )}
