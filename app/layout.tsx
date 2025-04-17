@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { DollarProvider } from '@/lib/context/dollar-context'
 
 export const metadata: Metadata = {
   title: 'Argentina Dashboard - Comparación de Precios',
@@ -14,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased"><DollarProvider>{children}</DollarProvider></body>
     </html>
   )
 }
