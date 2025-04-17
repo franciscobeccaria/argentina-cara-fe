@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 import type { ProductType } from "@/lib/types"
-import { CalendarIcon } from "lucide-react"
+import { ArrowDown, ArrowUp, CalendarIcon, DollarSign, Percent } from "lucide-react"
+import { useDollar } from "@/lib/context/dollar-context"
 
 interface ProductCardProps {
   product: ProductType
@@ -10,11 +11,15 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { name, priceARS, priceUSDBlue, priceUSA, priceDifferencePercentage, image, lastUpdated } = product
+  const { getCurrentDollarValue } = useDollar()
+  
+  // Calculate price in USD based on the selected dollar type
+  const dollarValue = getCurrentDollarValue()
+  const priceUSDSelected = Math.round(priceARS / dollarValue)
 
-  const isMoreExpensive = priceDifferencePercentage > 0
-  const badgeText = isMoreExpensive
-    ? `+${priceDifferencePercentage}% más caro`
-    : `${Math.abs(priceDifferencePercentage)}% más barato`
+  // Determine if the price is higher or lower
+  const isHigher = priceDifferencePercentage > 0
+  const absoluteDiff = Math.abs(priceDifferencePercentage)
 
   // Format the date to a more readable format
   const formatDate = (dateString: string) => {
@@ -38,30 +43,40 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">{name}</CardTitle>
-          <Badge
-            variant={isMoreExpensive ? "destructive" : "success"}
-            className={isMoreExpensive ? "bg-red-500" : "bg-green-500"}
+          <CardTitle className="text-base">{name}</CardTitle>
+          <div
+            className={`flex items-center justify-center rounded-full p-2 ${isHigher ? "bg-red-50" : "bg-green-50"}`}
           >
-            {badgeText}
-          </Badge>
+            <div
+              className={`flex items-center gap-1 font-bold text-sm ${isHigher ? "text-red-600" : "text-green-600"}`}
+            >
+              {isHigher ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+              {absoluteDiff.toFixed(1)}
+              <Percent className="w-4 h-4" />
+            </div>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div>
-            <p className="text-muted-foreground">Argentina</p>
-            <p className="font-medium">ARS {priceARS.toLocaleString()}</p>
-            <p className="text-xs text-muted-foreground">USD {priceUSDBlue} (blue)</p>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="space-y-1">
+            <div>
+              <p className="text-muted-foreground">Argentina</p>
+              <p className="font-medium">ARS {priceARS.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground flex items-center mt-1">
+                USD {priceUSDSelected}
+              </p>
+            </div>
           </div>
-          <div>
-            <p className="text-muted-foreground">EE.UU.</p>
-            <p className="font-medium">USD {priceUSA}</p>
-            <p className="text-xs text-muted-foreground">Precio oficial</p>
+          <div className="space-y-1">
+            <div>
+              <p className="text-muted-foreground">EE.UU.</p>
+              <p className="font-medium">USD {priceUSA}</p>
+            </div>
           </div>
         </div>
-        <div className="flex items-center mt-3 text-xs text-muted-foreground">
-          <CalendarIcon className="h-3 w-3 mr-1" />
+        <div className="flex items-center mt-4 text-xs text-muted-foreground">
+          <CalendarIcon className="h-3 w-3 mr-2" />
           Actualizado: {formatDate(lastUpdated)}
         </div>
       </CardContent>

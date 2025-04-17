@@ -1,40 +1,11 @@
 "use client"
 
-import { useState } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Label } from "@/components/ui/label"
+import { dollarTypes, useDollar } from "@/lib/context/dollar-context"
 
-interface DollarType {
-  id: string
-  name: string
-  value: number
-}
-
-const dollarTypes: DollarType[] = [
-  {
-    id: "blue",
-    name: "Dólar Blue",
-    value: 1000,
-  },
-  {
-    id: "oficial",
-    name: "Dólar Oficial",
-    value: 870,
-  },
-  {
-    id: "mep",
-    name: "Dólar MEP",
-    value: 980,
-  },
-  {
-    id: "ccl",
-    name: "Dólar CCL",
-    value: 990,
-  },
-]
 
 export default function DollarSelector() {
-  const [selectedDollar, setSelectedDollar] = useState<string>("blue")
+  const { selectedDollar, setSelectedDollar } = useDollar()
 
   return (
     <div className="flex items-center justify-end mb-6 gap-2">

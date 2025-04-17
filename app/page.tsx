@@ -1,8 +1,11 @@
+"use client"
+
 import { DollarSign, ShoppingBag, TrendingUp, Coffee } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import ProductCard from "@/components/product-card"
 import { products, summaryKpis } from "@/lib/data"
 import DollarSelector from "@/components/dollar-selector"
+import { DollarProvider } from "@/lib/context/dollar-context"
 
 export default function Dashboard() {
   // Calculate the average price difference percentage
@@ -17,15 +20,16 @@ export default function Dashboard() {
     : `Argentina está ${Math.abs(avgPriceDiffPercentage)}% más barata en promedio`
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Argentina está cara en dólares?</h1>
-          <p className="mt-2 text-muted-foreground">
-            Un índice visual de productos populares que compara precios entre Argentina y EE.UU.
-          </p>
-        </div>
+    <DollarProvider>
+      <div className="min-h-screen bg-slate-50">
+        <div className="container mx-auto px-4 py-8">
+          {/* Header */}
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Argentina está cara en dólares?</h1>
+            <p className="mt-2 text-muted-foreground">
+              Un índice visual de productos populares que compara precios entre Argentina y EE.UU.
+            </p>
+          </div>
 
         {/* Main KPI Card */}
         <Card className={`mx-auto mb-8 max-w-md ${isMoreExpensive ? "bg-red-50" : "bg-green-50"}`}>
@@ -70,7 +74,8 @@ export default function Dashboard() {
             ))}
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </DollarProvider>
   )
 }
