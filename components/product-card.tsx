@@ -10,12 +10,15 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const { name, priceARS, priceUSDBlue, priceUSA, priceDifferencePercentage, image, lastUpdated } = product
-  const { getCurrentDollarValue } = useDollar()
+  const { name, priceARS, priceUSDBlue, priceUSA, priceDifferencePercentage, image, lastUpdated, brand, category } = product
+  const { getCurrentDollarValue, selectedDollar } = useDollar()
+  
+  // Determine if the product price is already in USD in Argentina
+  const isPriceInUSD = category === "tecnologia" && name.includes("iPhone")
   
   // Calculate price in USD based on the selected dollar type
   const dollarValue = getCurrentDollarValue()
-  const priceUSDSelected = Math.round(priceARS / dollarValue)
+  const priceUSDSelected = isPriceInUSD ? priceUSDBlue : Math.round(priceARS / dollarValue)
 
   // Determine if the price is higher or lower
   const isHigher = priceDifferencePercentage > 0
@@ -62,10 +65,21 @@ export default function ProductCard({ product }: ProductCardProps) {
           <div className="space-y-1">
             <div>
               <p className="text-muted-foreground">Argentina</p>
-              <p className="font-medium">ARS {priceARS.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground flex items-center mt-1">
-                USD {priceUSDSelected}
-              </p>
+              {isPriceInUSD ? (
+                <>
+                  <p className="font-medium">USD {priceUSDBlue.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    ARS {priceARS.toLocaleString()}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="font-medium">ARS {priceARS.toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground flex items-center mt-1">
+                    USD {priceUSDSelected}
+                  </p>
+                </>
+              )}
             </div>
           </div>
           <div className="space-y-1">

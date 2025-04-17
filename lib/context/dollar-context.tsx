@@ -12,22 +12,27 @@ export const dollarTypes: DollarType[] = [
   {
     id: "blue",
     name: "Dólar Blue",
-    value: 1000,
+    value: 1250,
   },
   {
     id: "oficial",
     name: "Dólar Oficial",
-    value: 870,
+    value: 1160,
   },
   {
     id: "mep",
     name: "Dólar MEP",
-    value: 980,
+    value: 1175,
   },
   {
     id: "ccl",
     name: "Dólar CCL",
-    value: 990,
+    value: 1191,
+  },
+  {
+    id: "cripto",
+    name: "Dólar Cripto",
+    value: 1207,
   },
 ]
 

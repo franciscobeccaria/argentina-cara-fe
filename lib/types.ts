@@ -6,7 +6,9 @@ export interface ProductType {
   priceUSA: number
   priceDifferencePercentage: number
   image?: string
-  lastUpdated: string // Added lastUpdated field
+  lastUpdated: string
+  brand?: string
+  category?: string
 }
 
 export interface SummaryKpiType {
