@@ -1,6 +1,6 @@
 "use client"
 
-import { DollarSign, ShoppingBag, TrendingUp, Coffee } from "lucide-react"
+import { DollarSign, ShoppingBag, TrendingUp, Coffee, Briefcase, Percent } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import ProductCard from "@/components/product-card"
 import { products, summaryKpis } from "@/lib/data"
@@ -65,6 +65,8 @@ export default function Dashboard() {
                   {kpi.icon === "shopping" && <ShoppingBag className="h-4 w-4 text-muted-foreground" />}
                   {kpi.icon === "trending" && <TrendingUp className="h-4 w-4 text-muted-foreground" />}
                   {kpi.icon === "coffee" && <Coffee className="h-4 w-4 text-muted-foreground" />}
+                  {kpi.icon === "percentage" && <Percent className="h-4 w-4 text-muted-foreground" />}
+                  {kpi.icon === "briefcase" && <Briefcase className="h-4 w-4 text-muted-foreground" />}
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{kpi.value}</div>

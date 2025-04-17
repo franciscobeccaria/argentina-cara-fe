@@ -13,5 +13,5 @@ export interface SummaryKpiType {
   title: string
   value: string
   description: string
-  icon: "dollar" | "shopping" | "trending" | "coffee"
+  icon: "dollar" | "shopping" | "trending" | "coffee" | "percentage" | "briefcase"
 }
