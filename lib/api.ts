@@ -1,9 +1,37 @@
-import { products, summaryKpis } from "./data"
+import { mapSupabaseProductsToProductType } from "./adapters/mapSupabaseProductsToProductType"
+import { summaryKpis } from "./data"
+
+const isBuild = process.env.NEXT_PHASE === "phase-production-build"
+
+const SUPABASE_URL = process.env.SUPABASE_URL!
+const SUPABASE_KEY = process.env.SUPABASE_KEY!
 
 export async function fetchProducts() {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(products), 100)
-  })
+  const endpoint = `${SUPABASE_URL}/rest/v1/productos_ultimos_precios`
+
+  try {
+    const res = await fetch(endpoint, {
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+      },
+      ...(isBuild
+        ? { cache: "no-store" }
+        : { next: { revalidate: 86400 } }),
+    })
+
+    if (!res.ok) {
+      const errorBody = await res.text()
+      console.error(`Error getting products: ${res.status} ${res.statusText}`, errorBody)
+      throw new Error(`Error getting products`)
+    }
+
+    const rawData = await res.json()
+    return mapSupabaseProductsToProductType(rawData)
+  } catch (error) {
+    console.error("Error fetchProducts:", error)
+    throw error
+  }
 }
 
 export async function fetchSummaryKpis() {
