@@ -10,6 +10,7 @@ export const products: ProductType[] = [
     priceUSA: 1500,
     priceDifferencePercentage: 160,
     image: "/placeholder.svg?height=160&width=320",
+    lastUpdated: "2024-04-15",
   },
   {
     id: 2,
@@ -19,6 +20,7 @@ export const products: ProductType[] = [
     priceUSA: 180,
     priceDifferencePercentage: 39,
     image: "/placeholder.svg?height=160&width=320",
+    lastUpdated: "2024-04-12",
   },
   {
     id: 3,
@@ -28,6 +30,7 @@ export const products: ProductType[] = [
     priceUSA: 18,
     priceDifferencePercentage: -17,
     image: "/placeholder.svg?height=160&width=320",
+    lastUpdated: "2024-04-14",
   },
   {
     id: 4,
@@ -37,6 +40,7 @@ export const products: ProductType[] = [
     priceUSA: 1299,
     priceDifferencePercentage: 246,
     image: "/placeholder.svg?height=160&width=320",
+    lastUpdated: "2024-04-10",
   },
 ]
 
