@@ -2,6 +2,7 @@ import { DollarSign, ShoppingBag, TrendingUp, Coffee } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import ProductCard from "@/components/product-card"
 import { products, summaryKpis } from "@/lib/data"
+import DollarSelector from "@/components/dollar-selector"
 
 export default function Dashboard() {
   // Calculate the average price difference percentage
@@ -20,7 +21,7 @@ export default function Dashboard() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Argentina está cara en dólares blue?</h1>
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Argentina está cara en dólares?</h1>
           <p className="mt-2 text-muted-foreground">
             Un índice visual de productos populares que compara precios entre Argentina y EE.UU.
           </p>
@@ -38,6 +39,8 @@ export default function Dashboard() {
             <p className={`text-sm ${isMoreExpensive ? "text-red-600" : "text-green-600"}`}>{statusText}</p>
           </CardContent>
         </Card>
+
+        <DollarSelector />
 
         {/* Product Cards Grid */}
         <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
