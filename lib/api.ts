@@ -1,5 +1,6 @@
 import { mapSupabaseProductsToProductType } from "./adapters/mapSupabaseProductsToProductType"
 import { summaryKpis } from "./data"
+import { triggerGitHubWorkflow } from "./github"
 
 const isBuild = process.env.NEXT_PHASE === "phase-production-build"
 
@@ -10,13 +11,16 @@ export async function fetchProducts() {
   const endpoint = `${SUPABASE_URL}/rest/v1/productos_ultimos_precios`
 
   try {
+    if (process.env.TRIGGER_GITHUB === "true")
+      await triggerGitHubWorkflow()
+
     const res = await fetch(endpoint, {
       headers: {
         apikey: SUPABASE_KEY,
         Authorization: `Bearer ${SUPABASE_KEY}`,
       },
       ...(isBuild
-        ? { cache: "no-store" }
+        ? { next: { revalidate: 1 } }
         : { next: { revalidate: 86400 } }),
     })
 

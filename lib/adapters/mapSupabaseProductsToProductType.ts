@@ -29,8 +29,6 @@ export type ProductType = {
 }
 
 export function mapSupabaseProductsToProductType(data: RawProduct[]): ProductType[] {
-  console.log(data[1].data.AR)
-  
   return data.map((item) => ({
     id: item.product_id,
     name: item.product_name,
