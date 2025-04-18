@@ -11,9 +11,6 @@ export async function fetchProducts() {
   const endpoint = `${SUPABASE_URL}/rest/v1/productos_ultimos_precios`
 
   try {
-    if (process.env.TRIGGER_GITHUB === "true")
-      await triggerGitHubWorkflow()
-
     const res = await fetch(endpoint, {
       headers: {
         apikey: SUPABASE_KEY,
