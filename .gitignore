@@ -27,3 +27,7 @@ yarn-error.log*
 next-env.d.ts
 
 .DS_Store
+
+.bmad-core
+.claude
+web-bundles
