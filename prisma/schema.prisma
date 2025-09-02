@@ -1,0 +1,131 @@
+// Dashboard Argentina - Database Schema
+// Migrated from Supabase to PostgreSQL with enhancements for user contributions
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Current product structure (migrated from Supabase)
+model Product {
+  id           String   @id @default(cuid())
+  productId    String   @unique @map("product_id")
+  productName  String   @map("product_name")
+  brand        String?
+  imageUrl     String?  @map("image_url")
+  categoryId   String?  @map("category_id")
+  category     Category? @relation(fields: [categoryId], references: [id])
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // JSONB data structure matching Supabase format
+  data         Json
+
+  // Relations for future user contributions system
+  contributions UserContribution[]
+  votes         Vote[]
+
+  @@map("productos_ultimos_precios")
+}
+
+// Categories for product organization
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  displayName String    @map("display_name")
+  description String?
+  color       String?   // For UI visualization
+  icon        String?   // Icon identifier
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  products    Product[]
+  contributions UserContribution[]
+
+  @@map("categories")
+}
+
+// Future: User contributions system
+model UserContribution {
+  id              String               @id @default(cuid())
+  productId       String?              @map("product_id")
+  product         Product?             @relation(fields: [productId], references: [id])
+  categoryId      String?              @map("category_id")
+  category        Category?            @relation(fields: [categoryId], references: [id])
+  
+  // Product details
+  productName     String               @map("product_name")
+  brand           String?
+  prices          Json                 // Country-specific prices
+  sourceUrl       String?              @map("source_url")
+  sourceProof     String?              @map("source_proof") // Image or additional proof
+  
+  // Contribution metadata
+  status          ContributionStatus   @default(PENDING)
+  fingerprint     String?              // Browser fingerprint
+  ipAddress       String?              @map("ip_address")
+  userAgent       String?              @map("user_agent")
+  
+  // Admin moderation
+  verifiedAt      DateTime?            @map("verified_at")
+  verifiedBy      String?              @map("verified_by")
+  rejectedAt      DateTime?            @map("rejected_at")
+  rejectionReason String?              @map("rejection_reason")
+  
+  createdAt       DateTime             @default(now()) @map("created_at")
+  updatedAt       DateTime             @updatedAt @map("updated_at")
+
+  // Relations
+  votes           Vote[]
+
+  @@map("user_contributions")
+}
+
+// Voting system for quality control
+model Vote {
+  id               String            @id @default(cuid())
+  productId        String?           @map("product_id")
+  product          Product?          @relation(fields: [productId], references: [id])
+  contributionId   String?           @map("contribution_id")
+  contribution     UserContribution? @relation(fields: [contributionId], references: [id])
+  
+  voteType         VoteType          @map("vote_type")
+  fingerprint      String            // Browser fingerprint for duplicate prevention
+  ipAddress        String?           @map("ip_address")
+  userAgent        String?           @map("user_agent")
+  
+  createdAt        DateTime          @default(now()) @map("created_at")
+
+  // Unique constraint to prevent duplicate votes
+  @@unique([fingerprint, productId])
+  @@unique([fingerprint, contributionId])
+  @@map("votes")
+}
+
+// Historical data tracking
+model PriceHistory {
+  id            String   @id @default(cuid())
+  productId     String   @map("product_id")
+  prices        Json     // Country-specific prices snapshot
+  source        String   // "scraping", "manual", "user_contribution"
+  sourceId      String?  @map("source_id") // ID of the source (contribution_id, etc.)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@map("price_history")
+}
+
+// Enums
+enum ContributionStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum VoteType {
+  USEFUL
+  NOT_USEFUL
+}

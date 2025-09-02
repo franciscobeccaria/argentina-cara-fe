@@ -1,36 +1,45 @@
-import { mapSupabaseProductsToProductType } from "./adapters/mapSupabaseProductsToProductType"
+import { prisma } from "./prisma"
 import { summaryKpis } from "./data"
 import { triggerGitHubWorkflow } from "./github"
+import { ProductType } from "./types"
 
 const isBuild = process.env.NEXT_PHASE === "phase-production-build"
 
-const SUPABASE_URL = process.env.SUPABASE_URL!
-const SUPABASE_KEY = process.env.SUPABASE_KEY!
-
-export async function fetchProducts() {
-  const endpoint = `${SUPABASE_URL}/rest/v1/productos_ultimos_precios`
-
+export async function fetchProducts(): Promise<ProductType[]> {
   try {
-    const res = await fetch(endpoint, {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
+    console.log('🔍 Fetching products from PostgreSQL...')
+    
+    const products = await prisma.product.findMany({
+      include: {
+        category: true
       },
-      ...(isBuild
-        ? { next: { revalidate: 1 } }
-        : { next: { revalidate: 86400 } }),
+      orderBy: {
+        updatedAt: 'desc'
+      }
     })
 
-    if (!res.ok) {
-      const errorBody = await res.text()
-      console.error(`Error getting products: ${res.status} ${res.statusText}`, errorBody)
-      throw new Error(`Error getting products`)
-    }
+    // Transform Prisma products to ProductType format
+    const transformedProducts: ProductType[] = products.map(product => {
+      const data = product.data as any
+      
+      return {
+        id: parseInt(product.id, 36), // Convert string ID to number for compatibility
+        name: product.productName,
+        priceArgentina: data.AR?.value || 0,
+        priceArgentinaCurreny: data.AR?.currency || "ARS",
+        priceUSA: data.US?.value || 0,
+        image: product.imageUrl || undefined,
+        lastUpdated: product.updatedAt.toISOString(),
+        brand: product.brand || undefined,
+        category: product.category?.name || undefined,
+      }
+    })
 
-    const rawData = await res.json()
-    return mapSupabaseProductsToProductType(rawData)
+    console.log(`✅ Successfully fetched ${transformedProducts.length} products from PostgreSQL`)
+    return transformedProducts
+    
   } catch (error) {
-    console.error("Error fetchProducts:", error)
+    console.error("❌ Error fetching products from PostgreSQL:", error)
     throw error
   }
 }
@@ -39,4 +48,69 @@ export async function fetchSummaryKpis() {
   return new Promise((resolve) => {
     setTimeout(() => resolve(summaryKpis), 100)
   })
+}
+
+// Future: Fetch categories
+export async function fetchCategories() {
+  try {
+    const categories = await prisma.category.findMany({
+      include: {
+        products: true
+      },
+      orderBy: {
+        displayName: 'asc'
+      }
+    })
+
+    return categories.map(category => ({
+      id: category.id,
+      name: category.name,
+      displayName: category.displayName,
+      description: category.description,
+      color: category.color,
+      icon: category.icon,
+      productCount: category.products.length
+    }))
+  } catch (error) {
+    console.error("Error fetching categories:", error)
+    throw error
+  }
+}
+
+// Future: Fetch products by category
+export async function fetchProductsByCategory(categoryName: string): Promise<ProductType[]> {
+  try {
+    const products = await prisma.product.findMany({
+      where: {
+        category: {
+          name: categoryName
+        }
+      },
+      include: {
+        category: true
+      },
+      orderBy: {
+        updatedAt: 'desc'
+      }
+    })
+
+    return products.map(product => {
+      const data = product.data as any
+      
+      return {
+        id: parseInt(product.id, 36),
+        name: product.productName,
+        priceArgentina: data.AR?.value || 0,
+        priceArgentinaCurreny: data.AR?.currency || "ARS",
+        priceUSA: data.US?.value || 0,
+        image: product.imageUrl || undefined,
+        lastUpdated: product.updatedAt.toISOString(),
+        brand: product.brand || undefined,
+        category: product.category?.name || undefined,
+      }
+    })
+  } catch (error) {
+    console.error(`Error fetching products for category ${categoryName}:`, error)
+    throw error
+  }
 }

@@ -31,3 +31,4 @@ next-env.d.ts
 .bmad-core
 .claude
 web-bundles
+/lib/generated/prisma
