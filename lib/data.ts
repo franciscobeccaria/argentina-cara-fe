@@ -1,6 +1,6 @@
-import type { ProductType, SummaryKpiType } from "./types"
+import type { ProductType, SummaryKpiType, CategoryIndex, ContributionType } from "./types"
 
-// Real data for products
+// Enhanced mock data for products with new features
 export const products: ProductType[] = [
   {
     id: 1,
@@ -12,6 +12,10 @@ export const products: ProductType[] = [
     lastUpdated: "2025-04-16",
     brand: "Apple",
     category: "tecnologia",
+    dataSource: "scraped",
+    categoryType: "tech",
+    sourceUrl: "https://apple.com/iphone-16-pro",
+    votes: { up: 24, down: 3, userVote: null },
   },
   {
     id: 2,
@@ -23,6 +27,10 @@ export const products: ProductType[] = [
     lastUpdated: "2025-04-16",
     brand: "Nike",
     category: "ropa",
+    dataSource: "scraped",
+    categoryType: "fashion",
+    sourceUrl: "https://nike.com/air-force-1",
+    votes: { up: 18, down: 2, userVote: null },
   },
   {
     id: 3,
@@ -34,6 +42,10 @@ export const products: ProductType[] = [
     lastUpdated: "2025-04-16",
     brand: "Nespresso",
     category: "gastronomia",
+    dataSource: "manual",
+    categoryType: "food",
+    sourceUrl: "https://nespresso.com/colombia",
+    votes: { up: 12, down: 1, userVote: null },
   },
   {
     id: 4,
@@ -45,6 +57,131 @@ export const products: ProductType[] = [
     lastUpdated: "2025-04-16",
     brand: "Adidas",
     category: "ropa",
+    dataSource: "scraped",
+    categoryType: "fashion",
+    sourceUrl: "https://adidas.com.ar/camiseta-argentina",
+    votes: { up: 31, down: 4, userVote: null },
+  },
+  {
+    id: 5,
+    name: "MacBook Air M3",
+    priceArgentina: 1899,
+    priceArgentinaCurreny: "USD",
+    priceUSA: 1299,
+    image: "https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/macbook-air-midnight-select-20220606?wid=904&hei=840&fmt=jpeg&qlt=90&.v=1653084303665",
+    lastUpdated: "2025-04-15",
+    brand: "Apple",
+    category: "tecnologia",
+    dataSource: "user_contributed",
+    categoryType: "tech",
+    sourceUrl: "https://mercadolibre.com.ar/macbook-air-m3",
+    votes: { up: 8, down: 2, userVote: null },
+    contributorName: "TechUser123",
+    verificationStatus: "pending",
+  },
+  {
+    id: 6,
+    name: "Zapatillas Adidas Ultraboost",
+    priceArgentina: 165000,
+    priceArgentinaCurreny: "ARS", 
+    priceUSA: 180,
+    image: "https://assets.adidas.com/images/h_840,f_auto,q_auto,fl_lossy,c_fill,g_auto/fbaf991a78bc4896a3e9ad7800abcec6_9366/Zapatillas_Ultraboost_22_Negro_GZ0127_01_standard.jpg",
+    lastUpdated: "2025-04-14",
+    brand: "Adidas",
+    category: "ropa",
+    dataSource: "verified",
+    categoryType: "fashion",
+    sourceUrl: "https://adidas.com.ar/ultraboost",
+    votes: { up: 15, down: 0, userVote: null },
+    contributorName: "RunnerBA",
+    verificationStatus: "approved",
+  },
+]
+
+// Mock data for category indices
+export const categoryIndices: CategoryIndex[] = [
+  {
+    category: "tech",
+    name: "Tecnología",
+    index: 65,
+    trend: "up",
+    color: "red",
+    productCount: 2,
+  },
+  {
+    category: "fashion",
+    name: "Moda",
+    index: -8,
+    trend: "down", 
+    color: "green",
+    productCount: 3,
+  },
+  {
+    category: "food",
+    name: "Gastronomía",
+    index: 12,
+    trend: "stable",
+    color: "yellow",
+    productCount: 1,
+  },
+  {
+    category: "home",
+    name: "Hogar",
+    index: 23,
+    trend: "up",
+    color: "yellow",
+    productCount: 0,
+  },
+  {
+    category: "cars",
+    name: "Autos",
+    index: 89,
+    trend: "up", 
+    color: "red",
+    productCount: 0,
+  },
+]
+
+// Mock data for pending contributions
+export const mockContributions: ContributionType[] = [
+  {
+    id: 1,
+    productName: "Samsung Galaxy S24",
+    priceArgentina: 1200,
+    priceArgentinaCurrency: "USD",
+    priceUSA: 899,
+    category: "tech",
+    sourceUrl: "https://samsung.com.ar/galaxy-s24",
+    contributorName: "TechReviewer",
+    submittedAt: "2025-04-16T10:30:00Z",
+    status: "pending",
+    votes: { up: 5, down: 1 },
+  },
+  {
+    id: 2,
+    productName: "Coca Cola 2.25L",
+    priceArgentina: 3500,
+    priceArgentinaCurrency: "ARS",
+    priceUSA: 2.5,
+    category: "food",
+    sourceUrl: "https://carrefour.com.ar/coca-cola",
+    contributorName: "LocalShopper",
+    submittedAt: "2025-04-15T16:45:00Z",
+    status: "pending",
+    votes: { up: 3, down: 0 },
+  },
+  {
+    id: 3,
+    productName: "IKEA Mesa LACK",
+    priceArgentina: 45000,
+    priceArgentinaCurrency: "ARS",
+    priceUSA: 25,
+    category: "home",
+    sourceUrl: "https://ikea.com.ar/mesa-lack",
+    contributorName: "HomeDecor",
+    submittedAt: "2025-04-14T12:20:00Z",
+    status: "pending",
+    votes: { up: 7, down: 2 },
   },
 ]
 

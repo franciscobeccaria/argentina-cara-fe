@@ -16,6 +16,8 @@ type RawProduct = {
   }
 }
 
+import type { ProductType as NewProductType, DataSource, CategoryType } from "../types"
+
 export type ProductType = {
   id: string
   name: string
@@ -28,16 +30,36 @@ export type ProductType = {
   category: string
 }
 
-export function mapSupabaseProductsToProductType(data: RawProduct[]): ProductType[] {
+const mapCategoryToType = (category: string): CategoryType => {
+  const categoryMap: Record<string, CategoryType> = {
+    'tecnologia': 'tech',
+    'ropa': 'fashion', 
+    'gastronomia': 'food',
+    'hogar': 'home',
+    'autos': 'cars',
+  }
+  return categoryMap[category] || 'other'
+}
+
+export function mapSupabaseProductsToProductType(data: RawProduct[]): NewProductType[] {
   return data.map((item) => ({
-    id: item.product_id,
+    id: parseInt(item.product_id),
     name: item.product_name,
     priceArgentina: item.data.AR.value,
-    priceArgentinaCurreny: item.data.AR.currency,
+    priceArgentinaCurreny: item.data.AR.currency as "USD" | "ARS",
     priceUSA: item.data.US.value,
     image: item.image_url,
     lastUpdated: item.created_at,
     brand: item.brand,
     category: item.category_id,
+    // New required fields
+    dataSource: "scraped" as DataSource,
+    categoryType: mapCategoryToType(item.category_id),
+    votes: {
+      up: 0,
+      down: 0,
+      userVote: null,
+    },
+    sourceUrl: undefined,
   }))
 }
