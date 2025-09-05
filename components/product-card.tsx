@@ -98,89 +98,76 @@ export default function ProductCard({ product, onVote, onClick }: ProductCardPro
 
   return (
     <Card className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>
-      <div className="relative h-32 bg-slate-100">
+      <div className="relative h-20 bg-slate-100">
         <Image
-          src={image || "/placeholder.svg?height=160&width=320"}
+          src={image || "/placeholder.svg?height=80&width=200"}
           alt={name}
           fill
           className="object-cover opacity-80"
         />
-        {/* Data source badge */}
-        <div className="absolute top-2 left-2">
-          <Badge variant="secondary" className={`text-xs ${sourceInfo.color}`}>
-            <sourceInfo.icon className="w-3 h-3 mr-1" />
-            {sourceInfo.label}
-          </Badge>
-        </div>
-        {/* Verification badge */}
+        {/* Only show verification badge for verified items */}
         {(dataSource === "verified" || verificationStatus === "approved") && (
-          <div className="absolute top-2 right-2">
-            <Badge variant="secondary" className="bg-green-50 text-green-700">
-              <CheckCircle className="w-3 h-3 mr-1" />
-              Verificado
+          <div className="absolute top-1 right-1">
+            <Badge variant="secondary" className="bg-green-50 text-green-700 text-xs px-1 py-0">
+              <CheckCircle className="w-2 h-2" />
             </Badge>
           </div>
         )}
-      </div>
-      <CardHeader className="pb-1">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-sm font-medium truncate">{name}</CardTitle>
+        {/* Price difference indicator */}
+        <div className="absolute bottom-1 right-1">
           <div
-            className={`flex items-center justify-center rounded-full px-2 py-1 ${isHigher ? "bg-red-50" : "bg-green-50"}`}
+            className={`flex items-center justify-center rounded-full px-1.5 py-0.5 ${isHigher ? "bg-red-50" : "bg-green-50"}`}
           >
             <div
-              className={`flex items-center gap-1 font-bold text-xs ${isHigher ? "text-red-600" : "text-green-600"}`}
+              className={`flex items-center gap-0.5 font-bold text-xs ${isHigher ? "text-red-600" : "text-green-600"}`}
             >
-              {isHigher ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+              {isHigher ? <ArrowUp className="w-2 h-2" /> : <ArrowDown className="w-2 h-2" />}
               {percentageDiff.toFixed(0)}%
             </div>
           </div>
         </div>
+      </div>
+      <CardHeader className="pb-0 pt-2 px-3">
+        <CardTitle className="text-xs font-medium truncate leading-tight">{name}</CardTitle>
       </CardHeader>
-      <CardContent className="pt-2 pb-3">
-        {/* Simplified price comparison */}
-        <div className="flex justify-between items-center text-xs mb-2">
+      <CardContent className="pt-1 pb-2 px-3">
+        {/* Compact price comparison */}
+        <div className="flex justify-between items-center text-xs mb-1">
           <div>
-            <span className="text-muted-foreground">ARG: </span>
             <span className="font-medium">${formatMoney(isPriceInUSD ? priceArgentina : priceInUSD)}</span>
           </div>
           <div>
-            <span className="text-muted-foreground">USA: </span>
             <span className="font-medium">${formatMoney(priceUSA)}</span>
           </div>
         </div>
 
-        {/* Compact footer */}
+        {/* Very compact footer */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             <Button
               variant={votes.userVote === "up" ? "default" : "ghost"}
               size="sm"
-              className="h-6 px-2 text-xs"
+              className="h-5 px-1 text-xs"
               onClick={(e) => {
                 e.stopPropagation()
                 handleVote("up")
               }}
             >
-              <ThumbsUp className="h-2 w-2 mr-1" />
-              {votes.up}
+              <ThumbsUp className="h-2 w-2" />
+              <span className="ml-0.5">{votes.up}</span>
             </Button>
             <Button
               variant={votes.userVote === "down" ? "destructive" : "ghost"}
               size="sm"
-              className="h-6 px-2 text-xs"
+              className="h-5 px-1 text-xs"
               onClick={(e) => {
                 e.stopPropagation()
                 handleVote("down")
               }}
             >
-              <ThumbsDown className="h-2 w-2 mr-1" />
-              {votes.down}
+              <ThumbsDown className="h-2 w-2" />
+              <span className="ml-0.5">{votes.down}</span>
             </Button>
-          </div>
-          
-          <div className="text-xs text-muted-foreground">
-            {formatDate(lastUpdated).split(' ')[0]}
           </div>
         </div>
       </CardContent>
