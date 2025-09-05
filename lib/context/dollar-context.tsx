@@ -48,7 +48,7 @@ async function fetchDollarRates(): Promise<DollarType[]> {
 }
 
 export function DollarProvider({ children }: { children: ReactNode }) {
-  const [selectedDollar, setSelectedDollar] = useState<string>("blue")
+  const [selectedDollar, setSelectedDollar] = useState<string>("oficial")
 
   const { data: dollarTypes = defaultDollarTypes, isLoading } = useQuery({
     queryKey: ["dollarTypes"],
