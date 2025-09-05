@@ -18,7 +18,24 @@ export const products: ProductType[] = [
     category: "tecnologia",
     location: "Apple Store Argentina vs Apple Store USA",
     description: "128GB, Natural Titanium",
-    methodology: "Precios oficiales de Apple Store en cada país"
+    methodology: "Precios oficiales de Apple Store en cada país",
+    sources: {
+      argentina: {
+        url: "https://www.apple.com/ar/iphone-16-pro/",
+        storeName: "Apple Store Argentina",
+        verified: true
+      },
+      usa: {
+        url: "https://www.apple.com/us/iphone-16-pro/",
+        storeName: "Apple Store USA",
+        verified: true
+      },
+      chile: {
+        url: "https://www.apple.com/cl/iphone-16-pro/",
+        storeName: "Apple Store Chile",
+        verified: true
+      }
+    }
   },
   {
     id: 2,
@@ -34,7 +51,19 @@ export const products: ProductType[] = [
     category: "tecnologia",
     location: "Samsung Store Argentina vs Best Buy USA",
     description: "128GB, Onyx Black",
-    methodology: "Precios oficiales de tiendas autorizadas"
+    methodology: "Precios oficiales de tiendas autorizadas",
+    sources: {
+      argentina: {
+        url: "https://www.samsung.com/ar/smartphones/galaxy-s24/",
+        storeName: "Samsung Argentina",
+        verified: true
+      },
+      usa: {
+        url: "https://www.bestbuy.com/site/samsung-galaxy-s24/",
+        storeName: "Best Buy USA",
+        verified: true
+      }
+    }
   },
   {
     id: 3,

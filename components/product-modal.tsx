@@ -4,8 +4,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { CalendarIcon, ExternalLink, Info, TrendingUp, MapPin } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { CalendarIcon, ExternalLink, ShoppingCart, CheckCircle, ArrowUpRight } from "lucide-react"
 import Image from "next/image"
 import type { ProductType } from "@/lib/types"
 import { useDollar } from "@/lib/context/dollar-context"
@@ -27,15 +27,12 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
     priceArgentinaCurreny,
     priceUSA,
     priceChile,
-    priceBrazil,
-    priceEurope,
     image,
     lastUpdated,
     brand,
     category,
-    location,
     description,
-    methodology,
+    sources,
   } = product
 
   const isPriceInUSD = priceArgentinaCurreny === "USD"
@@ -56,231 +53,199 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
     const date = new Date(dateString)
     return date.toLocaleDateString("es-AR", {
       day: "numeric",
-      month: "long",
+      month: "long", 
       year: "numeric",
     })
   }
 
-  // Prepare comparison data
-  const comparisons = [
-    { 
-      country: "Argentina", 
-      price: priceInUSD, 
-      currency: "USD",
-      originalPrice: isPriceInUSD ? priceArgentina : priceArgentina,
-      originalCurrency: isPriceInUSD ? "USD" : "ARS",
-      flag: "🇦🇷",
-      isBase: true
-    },
-    { 
-      country: "Estados Unidos", 
-      price: priceUSA, 
-      currency: "USD", 
-      flag: "🇺🇸",
-      isBase: false
-    },
-    ...(priceChile ? [{ 
-      country: "Chile", 
-      price: priceChile, 
-      currency: "USD", 
-      flag: "🇨🇱",
-      isBase: false 
-    }] : []),
-    ...(priceBrazil ? [{ 
-      country: "Brasil", 
-      price: priceBrazil, 
-      currency: "USD", 
-      flag: "🇧🇷",
-      isBase: false 
-    }] : []),
-    ...(priceEurope ? [{ 
-      country: "Europa", 
-      price: priceEurope, 
-      currency: "USD", 
-      flag: "🇪🇺",
-      isBase: false 
-    }] : []),
-  ]
+  // Calculate price difference
+  const priceDiff = priceInUSD - priceUSA
+  const percentageDiff = (priceDiff / priceUSA) * 100
+  const isArgentinaMore = percentageDiff > 0
 
-  const minPrice = Math.min(...comparisons.map(c => c.price))
-  const maxPrice = Math.max(...comparisons.map(c => c.price))
+  // Determine secondary comparison (Chile if available, otherwise none)
+  const secondaryComparison = priceChile ? {
+    country: "Chile",
+    price: priceChile,
+    flag: "🇨🇱",
+    diff: ((priceInUSD - priceChile) / priceChile) * 100
+  } : null
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start gap-4">
-            <div className="relative w-20 h-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+            <div className="relative w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
               <Image
-                src={image || "/placeholder.svg?height=80&width=80"}
+                src={image || "/placeholder.svg?height=64&width=64"}
                 alt={name}
                 fill
                 className="object-cover"
               />
             </div>
             <div className="flex-1">
-              <div className="flex items-start justify-between">
-                <DialogTitle className="text-2xl font-bold">{name}</DialogTitle>
+              <DialogTitle className="text-xl font-bold mb-2">{name}</DialogTitle>
+              <div className="flex items-center gap-3 text-sm">
                 {brand && <Badge variant="secondary">{brand}</Badge>}
-              </div>
-              {description && (
-                <p className="text-muted-foreground mt-2">{description}</p>
-              )}
-              <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <CalendarIcon className="h-4 w-4" />
-                  Actualizado: {formatDate(lastUpdated)}
-                </div>
                 <Badge variant="outline" className="capitalize">
                   {category}
                 </Badge>
+                <div className="flex items-center gap-1 text-muted-foreground">
+                  <CalendarIcon className="h-3 w-3" />
+                  {formatDate(lastUpdated)}
+                </div>
               </div>
+              {description && (
+                <p className="text-muted-foreground text-sm mt-2">{description}</p>
+              )}
             </div>
           </div>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Price Comparison Chart */}
+          {/* Main Price Comparison */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Comparación de Precios
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {comparisons.map((comparison) => {
-                  const percentage = ((comparison.price - minPrice) / (maxPrice - minPrice)) * 100
-                  const diffFromArgentina = ((comparison.price - priceInUSD) / priceInUSD * 100)
+            <CardContent className="p-6">
+              <div className="grid grid-cols-2 gap-6">
+                {/* Argentina */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🇦🇷</span>
+                    <h3 className="font-semibold">Argentina</h3>
+                  </div>
                   
-                  return (
-                    <div key={comparison.country} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{comparison.flag}</span>
-                          <span className="font-medium">{comparison.country}</span>
-                          {comparison.isBase && (
-                            <Badge variant="outline" className="text-xs">Base</Badge>
-                          )}
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold">
-                            {comparison.currency} {formatMoney(comparison.price)}
-                          </div>
-                          {comparison.originalCurrency && comparison.originalCurrency !== comparison.currency && (
-                            <div className="text-xs text-muted-foreground">
-                              {comparison.originalCurrency} {formatMoney(comparison.originalPrice)}
-                            </div>
-                          )}
-                          {!comparison.isBase && (
-                            <div className={`text-xs font-medium ${
-                              diffFromArgentina > 0 ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {diffFromArgentina > 0 ? '+' : ''}{diffFromArgentina.toFixed(1)}% vs ARG
-                            </div>
-                          )}
-                        </div>
+                  <div>
+                    <div className="text-2xl font-bold">
+                      {isPriceInUSD ? `USD ${formatMoney(priceArgentina)}` : `ARS ${formatMoney(priceArgentina)}`}
+                    </div>
+                    {isPriceInUSD ? (
+                      <div className="text-sm text-muted-foreground">
+                        ARS {formatMoney(priceInARS)}
                       </div>
-                      <div className="w-full bg-slate-200 rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full transition-all ${
-                            comparison.isBase 
-                              ? 'bg-blue-500' 
-                              : comparison.price === minPrice 
-                                ? 'bg-green-500' 
-                                : comparison.price === maxPrice 
-                                  ? 'bg-red-500' 
-                                  : 'bg-slate-400'
-                          }`}
-                          style={{ width: `${Math.max(percentage, 5)}%` }}
-                        />
+                    ) : (
+                      <div className="text-sm text-muted-foreground">
+                        USD {formatMoney(priceInUSD)}
+                      </div>
+                    )}
+                  </div>
+
+                  {sources?.argentina && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <ShoppingCart className="h-4 w-4" />
+                        <span className="text-muted-foreground">Fuente:</span>
+                        <span>{sources.argentina.storeName}</span>
+                        {sources.argentina.verified && (
+                          <CheckCircle className="h-3 w-3 text-green-600" />
+                        )}
+                      </div>
+                      {sources.argentina.url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => window.open(sources.argentina.url, '_blank')}
+                        >
+                          <ExternalLink className="h-3 w-3 mr-2" />
+                          Ver Precio
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* USA */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl">🇺🇸</span>
+                    <h3 className="font-semibold">Estados Unidos</h3>
+                  </div>
+                  
+                  <div>
+                    <div className="text-2xl font-bold">USD {formatMoney(priceUSA)}</div>
+                  </div>
+
+                  {sources?.usa && (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <ShoppingCart className="h-4 w-4" />
+                        <span className="text-muted-foreground">Fuente:</span>
+                        <span>{sources.usa.storeName}</span>
+                        {sources.usa.verified && (
+                          <CheckCircle className="h-3 w-3 text-green-600" />
+                        )}
+                      </div>
+                      {sources.usa.url && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => window.open(sources.usa.url, '_blank')}
+                        >
+                          <ExternalLink className="h-3 w-3 mr-2" />
+                          Ver Precio
+                        </Button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <Separator className="my-6" />
+
+              {/* Price Analysis */}
+              <div className="text-center space-y-2">
+                <div className={`text-3xl font-bold ${isArgentinaMore ? 'text-red-600' : 'text-green-600'}`}>
+                  {isArgentinaMore ? '+' : ''}{percentageDiff.toFixed(1)}%
+                </div>
+                <p className={`text-sm font-medium ${isArgentinaMore ? 'text-red-600' : 'text-green-600'}`}>
+                  Argentina está {Math.abs(percentageDiff).toFixed(1)}% 
+                  {isArgentinaMore ? ' más cara' : ' más barata'} que Estados Unidos
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Diferencia: USD {Math.abs(priceDiff).toFixed(2)}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Secondary Comparison (if available) */}
+          {secondaryComparison && (
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{secondaryComparison.flag}</span>
+                    <div>
+                      <div className="font-medium">{secondaryComparison.country}</div>
+                      <div className="text-sm text-muted-foreground">
+                        USD {formatMoney(secondaryComparison.price)}
                       </div>
                     </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Location Information */}
-          {location && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Ubicaciones de Referencia
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{location}</p>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-lg font-bold ${secondaryComparison.diff > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {secondaryComparison.diff > 0 ? '+' : ''}{secondaryComparison.diff.toFixed(1)}%
+                    </div>
+                    <div className="text-xs text-muted-foreground">vs Argentina</div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           )}
 
-          {/* Methodology */}
-          {methodology && (
+          {/* Methodology (if available) */}
+          {product.methodology && (
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Info className="h-5 w-5" />
-                  Metodología
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+              <CardContent className="p-4">
+                <h4 className="font-medium mb-2">Metodología</h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  {methodology}
+                  {product.methodology}
                 </p>
               </CardContent>
             </Card>
           )}
-
-          {/* Key Insights */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Análisis Clave</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-sm text-green-700">País más económico</h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">
-                      {comparisons.find(c => c.price === minPrice)?.flag}
-                    </span>
-                    <span className="font-medium">
-                      {comparisons.find(c => c.price === minPrice)?.country}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      USD {formatMoney(minPrice)}
-                    </span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-semibold text-sm text-red-700">País más caro</h4>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">
-                      {comparisons.find(c => c.price === maxPrice)?.flag}
-                    </span>
-                    <span className="font-medium">
-                      {comparisons.find(c => c.price === maxPrice)?.country}
-                    </span>
-                    <span className="text-sm text-muted-foreground">
-                      USD {formatMoney(maxPrice)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <Separator className="my-4" />
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">
-                  Diferencia máxima: <span className="font-semibold">
-                    {((maxPrice - minPrice) / minPrice * 100).toFixed(1)}%
-                  </span> entre el país más caro y más barato
-                </p>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Footer Actions */}
           <div className="flex items-center justify-between pt-4 border-t">

@@ -1,3 +1,10 @@
+export interface PriceSource {
+  url?: string
+  storeName: string
+  logoUrl?: string
+  verified: boolean
+}
+
 export interface ProductType {
   id: number
   name: string
@@ -14,6 +21,13 @@ export interface ProductType {
   location?: string
   description?: string
   methodology?: string
+  sources?: {
+    argentina?: PriceSource
+    usa?: PriceSource
+    chile?: PriceSource
+    brazil?: PriceSource
+    europe?: PriceSource
+  }
 }
 
 export interface SummaryKpiType {

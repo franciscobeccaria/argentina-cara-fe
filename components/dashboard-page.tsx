@@ -45,24 +45,30 @@ export default function DashboardPage({ products, summaryKpis }) {
       <section className="min-h-[85vh] flex flex-col justify-center items-center relative">
         <div className="container mx-auto px-4 text-center">
           {/* Main Title */}
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6">
             ¿Argentina está cara en dólares?
           </h1>
           
-          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground mb-12 max-w-3xl mx-auto">
             Un índice visual de productos reconocidos que compara precios entre Argentina y EE.UU.
           </p>
 
           {/* Main Index Display */}
-          <Card className={`mx-auto mb-8 max-w-md ${isMoreExpensive ? "bg-red-50" : "bg-green-50"}`}>
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Índice de Valor Relativo</CardTitle>
+          <Card className={`mx-auto mb-8 max-w-lg ${isMoreExpensive ? "bg-red-50" : "bg-green-50"} shadow-lg`}>
+            <CardHeader className="text-center pb-4">
+              <CardTitle className="text-2xl md:text-3xl">Índice de Valor Relativo</CardTitle>
+              <p className="text-sm text-muted-foreground mt-2">
+                Basado en {products.length} productos específicos
+              </p>
             </CardHeader>
-            <CardContent className="text-center">
-              <div className={`text-5xl font-bold mb-2 ${isMoreExpensive ? "text-red-600" : "text-green-600"}`}>
+            <CardContent className="text-center pb-8">
+              <div className={`text-6xl md:text-7xl font-bold mb-4 ${isMoreExpensive ? "text-red-600" : "text-green-600"}`}>
                 {formattedAvgPriceDiffPercentage}%
               </div>
-              <p className={`text-sm ${isMoreExpensive ? "text-red-600" : "text-green-600"}`}>{statusText}</p>
+              <p className={`text-lg font-medium ${isMoreExpensive ? "text-red-600" : "text-green-600"}`}>{statusText}</p>
+              <p className="text-sm text-muted-foreground mt-3">
+                vs Estados Unidos • Actualizado diariamente
+              </p>
             </CardContent>
           </Card>
         </div>
