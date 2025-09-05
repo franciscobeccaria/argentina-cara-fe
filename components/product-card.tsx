@@ -79,7 +79,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       className="overflow-hidden hover:shadow-lg transition-shadow group cursor-pointer" 
       onClick={() => setIsModalOpen(true)}
     >
-      <div className="relative h-32 bg-slate-100 group-hover:bg-slate-50 transition-colors">
+      <div className="relative h-24 bg-slate-100 group-hover:bg-slate-50 transition-colors">
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
           <Eye className="h-6 w-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
         </div>
@@ -96,18 +96,18 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
       </div>
       
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
             <CardTitle className="text-sm font-semibold leading-tight">{name}</CardTitle>
             {description && (
-              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
+              <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                 {description}
               </p>
             )}
           </div>
           <div
-            className={`flex items-center justify-center rounded-full p-1.5 shrink-0 ${
+            className={`flex items-center justify-center rounded-full p-1 shrink-0 ${
               isHigher ? "bg-red-50" : "bg-green-50"
             }`}
           >
@@ -123,13 +123,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
       </CardHeader>
       
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 px-4 pb-4">
         {/* Argentina Price */}
-        <div className="mb-3">
+        <div className="mb-2">
           <div className="flex items-center justify-between mb-1">
             <p className="text-xs font-medium text-muted-foreground">Argentina 🇦🇷</p>
-            {isBestDeal && <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-green-50 text-green-700">Mejor</Badge>}
-            {isWorstDeal && <Badge variant="outline" className="text-xs px-1.5 py-0.5 bg-red-50 text-red-700">Peor</Badge>}
+            {isBestDeal && <Badge variant="outline" className="text-xs px-1 py-0.5 bg-green-50 text-green-700">Mejor</Badge>}
+            {isWorstDeal && <Badge variant="outline" className="text-xs px-1 py-0.5 bg-red-50 text-red-700">Peor</Badge>}
           </div>
           {isPriceInUSD ? (
             <div>
@@ -149,8 +149,8 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Other Countries */}
-        <div className="space-y-2">
-          {comparisons.slice(0, 2).map((comparison, index) => {
+        <div className="space-y-1.5">
+          {comparisons.slice(0, 1).map((comparison, index) => {
             const diff = ((priceInUSD - comparison.price) / comparison.price * 100)
             return (
               <div key={index} className="flex items-center justify-between text-xs">
@@ -168,24 +168,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           })}
           
           {/* Show additional countries if available */}
-          {comparisons.length > 2 && (
-            <div className="text-xs text-muted-foreground text-center pt-1 border-t">
-              +{comparisons.length - 2} países más
+          {comparisons.length > 1 && (
+            <div className="text-xs text-muted-foreground text-center pt-1">
+              +{comparisons.length - 1} países más
             </div>
           )}
         </div>
 
-        {/* Location info */}
-        {location && (
-          <div className="mt-3 pt-2 border-t">
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
-              <Info className="h-3 w-3" />
-              {location}
-            </p>
-          </div>
-        )}
-
-        <div className="flex items-center mt-3 text-xs text-muted-foreground">
+        <div className="flex items-center mt-2 text-xs text-muted-foreground">
           <CalendarIcon className="h-3 w-3 mr-1" />
           {formatDate(lastUpdated)}
         </div>
