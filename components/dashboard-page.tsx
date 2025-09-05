@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useDollar } from "@/lib/context/dollar-context"
-import { DollarSign, ShoppingBag, TrendingUp, Coffee, Briefcase, Percent, Settings } from "lucide-react"
+import { DollarSign, ShoppingBag, TrendingUp, Coffee, Briefcase, Percent, Settings, Shield } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -23,6 +23,8 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
   const { getCurrentDollarValue } = useDollar()
   const [userVotes, setUserVotes] = useState<Record<number, "up" | "down" | null>>({})
   const [isAdminMode, setIsAdminMode] = useState(false)
+  const [showPowerUserHint, setShowPowerUserHint] = useState(false)
+  const [userInteractions, setUserInteractions] = useState(0)
   
   const {
     selectedCategory,
@@ -60,6 +62,16 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
       ...prev,
       [productId]: prev[productId] === voteType ? null : voteType
     }))
+    
+    // Track user interactions for power user features
+    setUserInteractions(prev => {
+      const newCount = prev + 1
+      if (newCount >= 3 && !showPowerUserHint) {
+        setTimeout(() => setShowPowerUserHint(true), 1000)
+      }
+      return newCount
+    })
+    
     // Here you would typically make an API call to record the vote
     console.log(`Voted ${voteType} on product ${productId}`)
   }
@@ -78,23 +90,41 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
   return (
     <div className="min-h-screen bg-slate-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header - Clean and focused */}
         <div className="mb-8 text-center">
-          <div className="flex items-center justify-between mb-4">
-            <div></div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Argentina está cara en dólares?</h1>
-              <p className="mt-2 text-muted-foreground">
-                Un índice dinámico con contribuciones de la comunidad
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <ContributionModal onSubmit={handleContribution} />
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Argentina está cara en dólares?</h1>
+          <p className="mt-2 text-muted-foreground">
+            Un índice dinámico que compara precios entre Argentina y EE.UU.
+          </p>
+          
+          {/* Admin access - Hidden by default, revealed on triple click */}
+          <div 
+            className="absolute top-4 right-4 opacity-0 hover:opacity-30 transition-opacity"
+            onClick={(e) => {
+              if (e.detail === 3) { // Triple click
+                setIsAdminMode(!isAdminMode)
+              }
+            }}
+          >
+            <div className="w-2 h-2 bg-gray-200 rounded-full"></div>
+          </div>
+        </div>
+
+        {/* Admin Panel - Only shown when admin mode is active */}
+        {isAdminMode && (
+          <Card className="mb-6 border-orange-200 bg-orange-50">
+            <CardHeader>
+              <CardTitle className="text-orange-700 flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Panel de Administración Activado
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Admin
+                  <Button variant="outline" className="border-orange-300 text-orange-700 hover:bg-orange-100">
+                    <Shield className="h-4 w-4 mr-2" />
+                    Abrir Panel Admin
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
@@ -107,9 +137,9 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
                   />
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-        </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Main KPI Card */}
         <Card className={`mx-auto mb-8 max-w-md ${isMoreExpensive ? "bg-red-50" : "bg-green-50"}`}>
@@ -139,7 +169,11 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
         {/* Category Filter */}
         <CategoryFilter 
           selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
+          onCategoryChange={(category) => {
+            setSelectedCategory(category)
+            // Track interaction
+            setUserInteractions(prev => prev + 1)
+          }}
         />
 
         {/* Product Cards Grid */}
@@ -156,8 +190,49 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
         {productsWithVotes.length === 0 && (
           <div className="text-center py-12 text-muted-foreground">
             <p className="text-lg mb-2">No hay productos en esta categoría</p>
-            <p className="text-sm">Prueba seleccionando otra categoría o contribuye con un nuevo producto</p>
+            <p className="text-sm mb-4">Prueba seleccionando otra categoría</p>
+            {/* Contextual contribution CTA when category is empty */}
+            <ContributionModal onSubmit={handleContribution} />
           </div>
+        )}
+
+        {/* Subtle contribution CTA after user has seen products */}
+        {productsWithVotes.length > 0 && (
+          <Card className="mb-8 border-dashed border-gray-300 bg-gray-50/50">
+            <CardContent className="p-6 text-center">
+              <p className="text-sm text-muted-foreground mb-3">
+                ¿Conocés algún producto que no esté en el índice?
+              </p>
+              <ContributionModal onSubmit={handleContribution} variant="subtle" />
+              <p className="text-xs text-muted-foreground mt-2">
+                Ayudá a mejorar el índice con tu experiencia local
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Power user hint - appears after engagement */}
+        {showPowerUserHint && !isAdminMode && (
+          <Card className="mb-6 border-blue-200 bg-blue-50 animate-fade-in">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-blue-700">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm">
+                    💡 <strong>Tip:</strong> Triple-click en la esquina superior derecha para acceder a funciones avanzadas
+                  </span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowPowerUserHint(false)}
+                  className="text-blue-600 hover:text-blue-700"
+                >
+                  ✕
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Summary KPIs Section */}

@@ -26,6 +26,7 @@ import type { CategoryType } from "@/lib/types"
 
 interface ContributionModalProps {
   onSubmit?: (contribution: ContributionFormData) => void
+  variant?: "default" | "subtle"
 }
 
 interface ContributionFormData {
@@ -48,7 +49,7 @@ const categoryOptions = [
   { value: "other" as CategoryType, label: "Otros" },
 ]
 
-export default function ContributionModal({ onSubmit }: ContributionModalProps) {
+export default function ContributionModal({ onSubmit, variant = "default" }: ContributionModalProps) {
   const [open, setOpen] = useState(false)
   const [formData, setFormData] = useState<ContributionFormData>({
     productName: "",
@@ -93,10 +94,17 @@ export default function ContributionModal({ onSubmit }: ContributionModalProps) 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="mb-6">
-          <Plus className="h-4 w-4 mr-2" />
-          Agregar Producto
-        </Button>
+        {variant === "subtle" ? (
+          <Button variant="outline" size="sm" className="text-sm">
+            <Plus className="h-4 w-4 mr-2" />
+            Contribuir producto
+          </Button>
+        ) : (
+          <Button>
+            <Plus className="h-4 w-4 mr-2" />
+            Agregar Producto
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
