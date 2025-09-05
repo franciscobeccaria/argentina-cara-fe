@@ -11,6 +11,9 @@ import DollarSelector from "@/components/dollar-selector"
 import CategoryFilter from "@/components/category-filter"
 import ContributionModal from "@/components/contribution-modal"
 import AdminPanel from "@/components/admin-panel"
+import ProductDetailModal from "@/components/product-detail-modal"
+import InsightCards from "@/components/insight-cards"
+import ExtendedFooter from "@/components/extended-footer"
 import { useProductFilter } from "@/hooks/use-product-filter"
 import type { CategoryType, ProductType, SummaryKpiType } from "@/lib/types"
 
@@ -25,6 +28,7 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
   const [isAdminMode, setIsAdminMode] = useState(false)
   const [showPowerUserHint, setShowPowerUserHint] = useState(false)
   const [userInteractions, setUserInteractions] = useState(0)
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null)
   
   const {
     selectedCategory,
@@ -92,9 +96,9 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
       <div className="container mx-auto px-4 py-8">
         {/* Header - Clean and focused */}
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Argentina está cara en dólares?</h1>
+          <h1 className="text-3xl font-bold tracking-tight md:text-4xl">¿Somos el País Más Caro del Mundo?</h1>
           <p className="mt-2 text-muted-foreground">
-            Un índice dinámico que compara precios entre Argentina y EE.UU.
+            El índice que compara Argentina con el mundo real
           </p>
           
           {/* Admin access - Hidden by default, revealed on triple click */}
@@ -166,23 +170,14 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
 
         <DollarSelector />
 
-        {/* Category Filter */}
-        <CategoryFilter 
-          selectedCategory={selectedCategory}
-          onCategoryChange={(category) => {
-            setSelectedCategory(category)
-            // Track interaction
-            setUserInteractions(prev => prev + 1)
-          }}
-        />
-
-        {/* Product Cards Grid */}
-        <div className="mb-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Product Cards Grid - Now 8 products in 2x4 layout */}
+        <div className="mb-8 grid gap-4 grid-cols-2 md:grid-cols-4 lg:grid-cols-4">
           {productsWithVotes.map((product) => (
             <ProductCard 
               key={product.id} 
               product={product} 
               onVote={handleVote}
+              onClick={() => setSelectedProduct(product)}
             />
           ))}
         </div>
@@ -235,8 +230,24 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
           </Card>
         )}
 
+        {/* Insight Cards */}
+        <InsightCards />
+
+        {/* Category Navigation */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold tracking-tight mb-4">Explora por Categorías</h2>
+          <CategoryFilter 
+            selectedCategory={selectedCategory}
+            onCategoryChange={(category) => {
+              setSelectedCategory(category)
+              // Track interaction
+              setUserInteractions(prev => prev + 1)
+            }}
+          />
+        </div>
+
         {/* Summary KPIs Section */}
-        <div className="mt-12 mb-6">
+        <div className="mb-6">
           <h2 className="text-2xl font-bold tracking-tight mb-4">Indicadores Económicos Clave</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {summaryKpis.map((kpi: SummaryKpiType, index: number) => (
@@ -258,6 +269,22 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
             ))}
           </div>
         </div>
+
+        {/* Extended Footer */}
+        <ExtendedFooter onSubmitContribution={handleContribution} />
+
+        {/* Product Detail Modal */}
+        {selectedProduct && (
+          <ProductDetailModal
+            product={selectedProduct}
+            isOpen={!!selectedProduct}
+            onClose={() => setSelectedProduct(null)}
+            onReportIssue={(productId) => {
+              console.log(`Report issue for product ${productId}`)
+              // Here you would handle the report issue functionality
+            }}
+          />
+        )}
       </div>
     </div>
   )

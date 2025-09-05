@@ -23,9 +23,10 @@ import { useDollar } from "@/lib/context/dollar-context"
 interface ProductCardProps {
   product: ProductType
   onVote?: (productId: number, voteType: "up" | "down") => void
+  onClick?: () => void
 }
 
-export default function ProductCard({ product, onVote }: ProductCardProps) {
+export default function ProductCard({ product, onVote, onClick }: ProductCardProps) {
   const { 
     id,
     name, 
@@ -96,8 +97,8 @@ export default function ProductCard({ product, onVote }: ProductCardProps) {
   
 
   return (
-    <Card className="overflow-hidden">
-      <div className="relative h-40 bg-slate-100">
+    <Card className="overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onClick={onClick}>
+      <div className="relative h-32 bg-slate-100">
         <Image
           src={image || "/placeholder.svg?height=160&width=320"}
           alt={name}
@@ -121,96 +122,65 @@ export default function ProductCard({ product, onVote }: ProductCardProps) {
           </div>
         )}
       </div>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-1">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-base">{name}</CardTitle>
+          <CardTitle className="text-sm font-medium truncate">{name}</CardTitle>
           <div
-            className={`flex items-center justify-center rounded-full p-2 ${isHigher ? "bg-red-50" : "bg-green-50"}`}
+            className={`flex items-center justify-center rounded-full px-2 py-1 ${isHigher ? "bg-red-50" : "bg-green-50"}`}
           >
             <div
-              className={`flex items-center gap-1 font-bold text-sm ${isHigher ? "text-red-600" : "text-green-600"}`}
+              className={`flex items-center gap-1 font-bold text-xs ${isHigher ? "text-red-600" : "text-green-600"}`}
             >
-              {isHigher ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
-              {percentageDiff.toFixed(1)}
-              <Percent className="w-4 h-4" />
+              {isHigher ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />}
+              {percentageDiff.toFixed(0)}%
             </div>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="space-y-1">
-            <div>
-              <p className="text-muted-foreground">Argentina</p>
-              {isPriceInUSD ? (
-                <>
-                  <p className="font-medium">USD {formatMoney(priceArgentina)}</p>
-                  <p className="text-xs text-muted-foreground mt-1 flex items-center">
-                    ARS {formatMoney(priceInARS)}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="font-medium">ARS {formatMoney(priceArgentina)}</p>
-                  <p className="text-xs text-muted-foreground flex items-center mt-1">
-                   USD {formatMoney(priceInUSD)}
-                  </p>
-                </>
-              )}
-            </div>
+      <CardContent className="pt-2 pb-3">
+        {/* Simplified price comparison */}
+        <div className="flex justify-between items-center text-xs mb-2">
+          <div>
+            <span className="text-muted-foreground">ARG: </span>
+            <span className="font-medium">${formatMoney(isPriceInUSD ? priceArgentina : priceInUSD)}</span>
           </div>
-          <div className="space-y-1">
-            <div>
-              <p className="text-muted-foreground">EE.UU.</p>
-              <p className="font-medium">USD {formatMoney(priceUSA)}</p>
-            </div>
+          <div>
+            <span className="text-muted-foreground">USA: </span>
+            <span className="font-medium">${formatMoney(priceUSA)}</span>
           </div>
         </div>
 
-        {/* Contributor info */}
-        {contributorName && (
-          <div className="mt-3 text-xs text-muted-foreground">
-            Contribuido por: <span className="font-medium">{contributorName}</span>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between mt-4">
-          <div className="flex items-center text-xs text-muted-foreground">
-            <CalendarIcon className="h-3 w-3 mr-2" />
-            {formatDate(lastUpdated)}
-            {sourceUrl && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="ml-2 p-0 h-auto text-xs text-muted-foreground hover:text-primary"
-                onClick={() => window.open(sourceUrl, "_blank")}
-              >
-                <ExternalLink className="h-3 w-3 mr-1" />
-                Ver fuente
-              </Button>
-            )}
-          </div>
-
-          {/* Voting controls */}
+        {/* Compact footer */}
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <Button
               variant={votes.userVote === "up" ? "default" : "ghost"}
               size="sm"
-              className="h-7 px-2"
-              onClick={() => handleVote("up")}
+              className="h-6 px-2 text-xs"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleVote("up")
+              }}
             >
-              <ThumbsUp className="h-3 w-3 mr-1" />
+              <ThumbsUp className="h-2 w-2 mr-1" />
               {votes.up}
             </Button>
             <Button
               variant={votes.userVote === "down" ? "destructive" : "ghost"}
               size="sm"
-              className="h-7 px-2"
-              onClick={() => handleVote("down")}
+              className="h-6 px-2 text-xs"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleVote("down")
+              }}
             >
-              <ThumbsDown className="h-3 w-3 mr-1" />
+              <ThumbsDown className="h-2 w-2 mr-1" />
               {votes.down}
             </Button>
+          </div>
+          
+          <div className="text-xs text-muted-foreground">
+            {formatDate(lastUpdated).split(' ')[0]}
           </div>
         </div>
       </CardContent>
