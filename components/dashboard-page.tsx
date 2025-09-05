@@ -237,12 +237,8 @@ export default function DashboardPage({ products, summaryKpis }: DashboardPagePr
         <div className="mb-12">
           <h2 className="text-2xl font-bold tracking-tight mb-4">Explora por Categorías</h2>
           <CategoryFilter 
-            selectedCategory={selectedCategory}
-            onCategoryChange={(category) => {
-              setSelectedCategory(category)
-              // Track interaction
-              setUserInteractions(prev => prev + 1)
-            }}
+            selectedCategory="all"
+            mode="navigation"
           />
         </div>
 

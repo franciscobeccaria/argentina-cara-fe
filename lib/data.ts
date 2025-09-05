@@ -139,7 +139,7 @@ export const products: ProductType[] = [
     brand: "Avellaneda",
     category: "ropa",
     dataSource: "manual",
-    categoryType: "fashion",
+    categoryType: "other",
     votes: { up: 25, down: 2, userVote: null },
   },
   {
@@ -159,31 +159,31 @@ export const products: ProductType[] = [
   },
 ]
 
-// Mock data for category indices
+// Mock data for category indices (updated with real product counts)
 export const categoryIndices: CategoryIndex[] = [
   {
     category: "tech",
     name: "Tecnología",
-    index: 65,
+    index: 46,
     trend: "up",
     color: "red",
-    productCount: 2,
+    productCount: 2, // iPhone 16 Pro, MacBook Air M3
   },
   {
     category: "fashion",
     name: "Moda",
-    index: -8,
-    trend: "down", 
-    color: "green",
-    productCount: 3,
+    index: 38,
+    trend: "up", 
+    color: "red",
+    productCount: 3, // Nike Air Force 1, Camiseta Adidas, Zapatillas Adidas Ultraboost
   },
   {
     category: "food",
     name: "Gastronomía",
-    index: 12,
-    trend: "stable",
-    color: "yellow",
-    productCount: 1,
+    index: 85,
+    trend: "up",
+    color: "red",
+    productCount: 4, // Café Nespresso, Un Café, Cena Restaurante, Canasta Supermercado
   },
   {
     category: "home",
@@ -200,6 +200,14 @@ export const categoryIndices: CategoryIndex[] = [
     trend: "up", 
     color: "red",
     productCount: 0,
+  },
+  {
+    category: "other",
+    name: "Otros",
+    index: 15,
+    trend: "stable",
+    color: "yellow",
+    productCount: 1, // Remera sin marca
   },
 ]
 

@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -15,12 +16,14 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  Filter
+  Filter,
+  ExternalLink
 } from "lucide-react"
 
 interface CategoryFilterProps {
-  selectedCategory: CategoryType | "all"
-  onCategoryChange: (category: CategoryType | "all") => void
+  selectedCategory?: CategoryType | "all"
+  onCategoryChange?: (category: CategoryType | "all") => void
+  mode?: "home" | "navigation"
 }
 
 const categoryIcons = {
@@ -41,7 +44,16 @@ const categoryNames = {
   other: "Otros",
 }
 
-export default function CategoryFilter({ selectedCategory, onCategoryChange }: CategoryFilterProps) {
+const categoryUrls = {
+  tech: "/categoria/tecnologia",
+  food: "/categoria/gastronomia",
+  fashion: "/categoria/moda", 
+  home: "/categoria/hogar",
+  cars: "/categoria/autos",
+  other: "/categoria/otros",
+}
+
+export default function CategoryFilter({ selectedCategory, onCategoryChange, mode = "home" }: CategoryFilterProps) {
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case "up": return <TrendingUp className="h-3 w-3" />
@@ -69,55 +81,108 @@ export default function CategoryFilter({ selectedCategory, onCategoryChange }: C
       </CardHeader>
       <CardContent>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-          <Button
-            variant={selectedCategory === "all" ? "default" : "outline"}
-            onClick={() => onCategoryChange("all")}
-            className="justify-start h-auto p-3"
-          >
-            <div className="flex flex-col items-start w-full">
-              <div className="flex items-center gap-2 mb-1">
-                <Package className="h-4 w-4" />
-                <span className="font-medium">Todos</span>
+          {mode === "home" ? (
+            <Link href="/">
+              <Button
+                variant={selectedCategory === "all" ? "default" : "outline"}
+                className="justify-start h-auto p-3 w-full"
+              >
+                <div className="flex flex-col items-start w-full">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Package className="h-4 w-4" />
+                    <span className="font-medium">Todos</span>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    Ver todo
+                  </span>
+                </div>
+              </Button>
+            </Link>
+          ) : (
+            <Button
+              variant={selectedCategory === "all" ? "default" : "outline"}
+              onClick={() => onCategoryChange && onCategoryChange("all")}
+              className="justify-start h-auto p-3"
+            >
+              <div className="flex flex-col items-start w-full">
+                <div className="flex items-center gap-2 mb-1">
+                  <Package className="h-4 w-4" />
+                  <span className="font-medium">Todos</span>
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  Ver todo
+                </span>
               </div>
-              <span className="text-xs text-muted-foreground">
-                Ver todo
-              </span>
-            </div>
-          </Button>
+            </Button>
+          )}
 
           {categoryIndices.map((categoryIndex) => {
             const IconComponent = categoryIcons[categoryIndex.category]
             const isSelected = selectedCategory === categoryIndex.category
+            const categoryUrl = categoryUrls[categoryIndex.category]
             
-            return (
-              <Button
-                key={categoryIndex.category}
-                variant={isSelected ? "default" : "outline"}
-                onClick={() => onCategoryChange(categoryIndex.category)}
-                className="justify-start h-auto p-3 relative"
-              >
-                <div className="flex flex-col items-start w-full">
-                  <div className="flex items-center gap-2 mb-1">
-                    <IconComponent className="h-4 w-4" />
-                    <span className="font-medium">{categoryIndex.name}</span>
-                  </div>
-                  <div className="flex items-center justify-between w-full">
-                    <Badge 
-                      variant="secondary" 
-                      className={`text-xs ${getIndexColor(categoryIndex.color)}`}
-                    >
-                      <div className="flex items-center gap-1">
-                        {getTrendIcon(categoryIndex.trend)}
-                        {categoryIndex.index > 0 ? "+" : ""}{categoryIndex.index}%
+            if (mode === "navigation") {
+              return (
+                <Link key={categoryIndex.category} href={categoryUrl}>
+                  <Button
+                    variant={isSelected ? "default" : "outline"}
+                    className="justify-start h-auto p-3 relative w-full group"
+                  >
+                    <div className="flex flex-col items-start w-full">
+                      <div className="flex items-center gap-2 mb-1">
+                        <IconComponent className="h-4 w-4" />
+                        <span className="font-medium">{categoryIndex.name}</span>
+                        <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      {categoryIndex.productCount} productos
-                    </span>
+                      <div className="flex items-center justify-between w-full">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-xs ${getIndexColor(categoryIndex.color)}`}
+                        >
+                          <div className="flex items-center gap-1">
+                            {getTrendIcon(categoryIndex.trend)}
+                            {categoryIndex.index > 0 ? "+" : ""}{categoryIndex.index}%
+                          </div>
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {categoryIndex.productCount} productos
+                        </span>
+                      </div>
+                    </div>
+                  </Button>
+                </Link>
+              )
+            } else {
+              return (
+                <Button
+                  key={categoryIndex.category}
+                  variant={isSelected ? "default" : "outline"}
+                  onClick={() => onCategoryChange && onCategoryChange(categoryIndex.category)}
+                  className="justify-start h-auto p-3 relative"
+                >
+                  <div className="flex flex-col items-start w-full">
+                    <div className="flex items-center gap-2 mb-1">
+                      <IconComponent className="h-4 w-4" />
+                      <span className="font-medium">{categoryIndex.name}</span>
+                    </div>
+                    <div className="flex items-center justify-between w-full">
+                      <Badge 
+                        variant="secondary" 
+                        className={`text-xs ${getIndexColor(categoryIndex.color)}`}
+                      >
+                        <div className="flex items-center gap-1">
+                          {getTrendIcon(categoryIndex.trend)}
+                          {categoryIndex.index > 0 ? "+" : ""}{categoryIndex.index}%
+                        </div>
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {categoryIndex.productCount} productos
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </Button>
-            )
+                </Button>
+              )
+            }
           })}
         </div>
         
